@@ -5,3 +5,7 @@ data class City (
     val lat: Double,
     val lon: Double
 )
+
+public fun getDefaultCity(): City {
+    return City("Москва", 33.021212, 88.0898)
+}
