@@ -1,20 +1,14 @@
 package ru.lachesis.weather_app.view
 
-import android.icu.util.Calendar
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import ru.lachesis.weather_app.R
+import ru.lachesis.weather_app.databinding.MainFragmentBinding
 import ru.lachesis.weather_app.viewmodel.MainViewModel
 
-import ru.lachesis.weather_app.databinding.MainFragmentBinding
 import ru.lachesis.weather_app.model.Weather
 import ru.lachesis.weather_app.viewmodel.AppState
 import java.util.*
@@ -32,17 +26,21 @@ class MainFragment : Fragment() {
     private val binding: MainFragmentBinding
         get() = _binding!!
 
+
 /*
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(binding.dayFragmentContainer.id,DayFragment.newInstance()).commit()
+
+        setHasOptionsMenu(true)
     }
 */
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(binding.dayFragmentContainer.id,DayFragment.newInstance()).commit()
+
+        registerForContextMenu(binding.cityName)
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,6 +50,29 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
+    override fun onCreateContextMenu(
+        menu: ContextMenu,
+        v: View,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+        val menuInflater: MenuInflater = requireActivity().menuInflater
+        menuInflater.inflate(R.menu.context_menu,menu)
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        val fManager = activity?.supportFragmentManager
+        val transaction = fManager?.beginTransaction()
+        transaction?.replace(binding.mainContainer.id,CitySelectFragment.newInstance())
+        val fragment = fManager?.findFragmentById(R.id.day_fragment_container)
+        if (fragment != null) {
+            transaction?.hide(fragment)
+        }
+        transaction?.addToBackStack("")?.commit()
+
+
+        return true
+    }
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -81,6 +102,8 @@ class MainFragment : Fragment() {
 
     private fun setData(weather: Weather) {
         binding.date.text = weather.getDateString()//weather.date.toString()//java.util.Calendar.getInstance(Locale.getDefault()).time.toString()
+        binding.tempLabel.text= resources.getString(R.string.temp_label)
+        binding.tempFeelLabel.text= resources.getString(R.string.feeled_label)
         binding.cityName.text = weather.city.city
         binding.coordinates.text= String.format(Locale.getDefault(),"lt/ln: ${weather.city.lat},${weather.city.lon}")
         binding.temperature.text = weather.temperature.toString()

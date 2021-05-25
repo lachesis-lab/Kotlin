@@ -28,15 +28,6 @@ class CustomRecyclerAdapter() :
         fun bind(weather: Weather) {
             itemView.findViewById<TextView>(R.id.hour).text = weather.getDateString()
             itemView.findViewById<TextView>(R.id.hour_temperature).text = String.format(Locale.getDefault(),"Температура:  ${weather.temperature}")
-/*
-            itemView.setOnClickListener {
-                Toast.makeText(
-                    itemView.context,
-                    weather.city.city,
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-*/
         }
 
 

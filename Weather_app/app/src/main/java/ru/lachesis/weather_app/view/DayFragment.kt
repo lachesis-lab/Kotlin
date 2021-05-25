@@ -44,7 +44,7 @@ class DayFragment : Fragment() {
         recyclerView = binding.recyclerView
         viewModel = ViewModelProvider(this).get(DayViewModel::class.java)
         adapter.setDayForecastData(viewModel.getDayForecast())
-        viewModel.dayLiveData.observe(viewLifecycleOwner, Observer() { renderData(it) })
+        viewModel.getLiveData().observe(viewLifecycleOwner, Observer { renderData(it) })//.observe(viewLifecycleOwner, Observer { renderData(it) })
 //        recyclerView.layoutManager= LinearLayoutManager(view.context)
         recyclerView.adapter=adapter
 
