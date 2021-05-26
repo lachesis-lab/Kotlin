@@ -4,15 +4,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import ru.lachesis.weather_app.R
 import ru.lachesis.weather_app.model.Weather
 import java.util.*
 
 
-class CustomRecyclerAdapter() :
-    RecyclerView.Adapter<CustomRecyclerAdapter.CustomViewHolder>() {
+class DayRecyclerAdapter() :
+    RecyclerView.Adapter<DayRecyclerAdapter.DayViewHolder>() {
 
     private var dayForecastData: List<Weather> = listOf()
 
@@ -23,7 +22,7 @@ class CustomRecyclerAdapter() :
 
 
 
-    inner class CustomViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class DayViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bind(weather: Weather) {
             itemView.findViewById<TextView>(R.id.hour).text = weather.getDateString()
@@ -40,13 +39,13 @@ class CustomRecyclerAdapter() :
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CustomViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayViewHolder {
         val itemView =
             LayoutInflater.from(parent.context).inflate(R.layout.hour_item, parent, false)
-        return CustomViewHolder(itemView)
+        return DayViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
 
         holder.bind(dayForecastData[position])
 

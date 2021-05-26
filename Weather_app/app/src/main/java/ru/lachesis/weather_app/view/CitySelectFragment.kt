@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import ru.lachesis.weather_app.R
@@ -18,7 +19,14 @@ class CitySelectFragment : Fragment() {
     private val recyclerView : RecyclerView by lazy { binding.citySelectRecycler }
     private val adapter: CitySelectAdapter = CitySelectAdapter(object: OnItemViewClickListener{
         override fun click(weather: Weather) {
-            activity?.supportFragmentManager?.beginTransaction()?.replace(R.id.main_container,MainFragment.newInstance())
+            val bundle = Bundle()
+            bundle.putParcelable(MainFragment.BUNDLE_EXTRA, weather)
+            val fManager = activity?.supportFragmentManager
+            val transaction = fManager?.beginTransaction()
+            transaction?.replace(R.id.main_container,MainFragment.newInstance(bundle))
+            transaction?.replace(R.id.day_fragment_container,DayFragment.newInstance())
+//            transaction?.addToBackStack("")
+            transaction?.commit()
         }
     })
     private var _binding: CitySelectFragmentBinding? = null
@@ -52,7 +60,10 @@ class CitySelectFragment : Fragment() {
 
         // TODO: Use the ViewModel
     }
-
+    override fun onDestroy() {
+        adapter.removeListener()
+        super.onDestroy()
+    }
     private fun RenderData(weatherList: List<Weather>) {
         adapter.setWeatherData(weatherList)
 

@@ -12,11 +12,17 @@ class MainActivity :  AppCompatActivity()  {
         setContentView(R.layout.activity_main)
         if (savedInstanceState == null) {
             val transaction = supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.main_container, MainFragment.newInstance())
+            transaction.replace(R.id.main_container, MainFragment.newInstance(null))
             transaction.replace(R.id.day_fragment_container,DayFragment.newInstance())
             transaction.commit()
 
 
         }
+
+    }
+
+    override fun onBackPressed() {
+        val fManager = supportFragmentManager
+        super.onBackPressed()
     }
 }

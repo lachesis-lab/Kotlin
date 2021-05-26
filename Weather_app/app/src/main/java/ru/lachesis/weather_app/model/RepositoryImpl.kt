@@ -3,8 +3,9 @@ package ru.lachesis.weather_app.model
 import java.util.*
 
 class RepositoryImpl: Repository {
-    override fun getLocalData(): Weather {
-        return Weather()
+    override fun getLocalData(weather: Weather?): Weather {
+        if (weather!=null) return weather
+        else return Weather()
     }
 
     override fun getRemoteData(): Weather {

@@ -30,6 +30,9 @@ class CitySelectAdapter(private var onItemViewClickListener: CitySelectFragment.
         return weatherData.size
     }
 
+    fun removeListener() {
+        onItemViewClickListener = null
+    }
 
     inner class CitySelectViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 

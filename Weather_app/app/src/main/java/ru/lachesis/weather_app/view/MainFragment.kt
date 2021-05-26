@@ -13,10 +13,15 @@ import ru.lachesis.weather_app.model.Weather
 import ru.lachesis.weather_app.viewmodel.AppState
 import java.util.*
 
-class MainFragment : Fragment() {
+class MainFragment  : Fragment() {
 
     companion object {
-        fun newInstance() = MainFragment()
+        const val BUNDLE_EXTRA = "weather"
+        fun newInstance(bundle: Bundle?): MainFragment {
+            val fragment = MainFragment()
+            fragment.arguments = bundle
+            return fragment
+        }
     }
 
     private lateinit var viewModel: MainViewModel
@@ -37,16 +42,36 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val weather = arguments?.getParcelable<Weather>(BUNDLE_EXTRA)
+/*
+        if (weather != null) {
+            val city = weather.city
+            binding.cityName.text = city.city
+            binding.coordinates.text = String.format(
+                getString(R.string.coordinates_label),
+                city.lat.toString(),
+                city.lon.toString()
+            )
+            binding.temperature.text = weather.temperature.toString()
+            binding.tempFeel.text = weather.feelsLike.toString()
+        }
+*/
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        val liveData = viewModel.getLiveData()
+            liveData.observe(viewLifecycleOwner, { renderData(it) })//Observer { renderData(it) })
+//        if (weather==null)
+            viewModel.getWeatherLocal(weather)
         requireActivity().supportFragmentManager.beginTransaction()
-            .replace(binding.dayFragmentContainer.id,DayFragment.newInstance()).commit()
+            .replace(binding.dayFragmentContainer.id, DayFragment.newInstance()).commit()
 
         registerForContextMenu(binding.cityName)
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = MainFragmentBinding.inflate(inflater,container,false)
+        _binding = MainFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -57,55 +82,58 @@ class MainFragment : Fragment() {
     ) {
         super.onCreateContextMenu(menu, v, menuInfo)
         val menuInflater: MenuInflater = requireActivity().menuInflater
-        menuInflater.inflate(R.menu.context_menu,menu)
+        menuInflater.inflate(R.menu.context_menu, menu)
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
         val fManager = activity?.supportFragmentManager
         val transaction = fManager?.beginTransaction()
-        transaction?.replace(binding.mainContainer.id,CitySelectFragment.newInstance())
+        transaction?.replace(binding.mainContainer.id, CitySelectFragment.newInstance())
         val fragment = fManager?.findFragmentById(R.id.day_fragment_container)
         if (fragment != null) {
             transaction?.hide(fragment)
         }
         transaction?.addToBackStack("")?.commit()
 
-
         return true
     }
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        viewModel.getLiveData().observe(viewLifecycleOwner, { renderData(it) })//Observer { renderData(it) })
-        viewModel.getWeatherLocal()
-    }
+
+//    override fun onActivityCreated(savedInstanceState: Bundle?) {
+//        super.onActivityCreated(savedInstanceState)
+//        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+//        viewModel.getLiveData()
+//            .observe(viewLifecycleOwner, { renderData(it) })//Observer { renderData(it) })
+//        viewModel.getWeatherLocal()
+//    }
 
     private fun renderData(appState: AppState?) {
         when (appState) {
             is AppState.Success -> {
                 val weather = appState.weather
-                binding.loadingLayout.visibility=View.GONE
+                binding.loadingLayout.visibility = View.GONE
                 setData(weather)
             }
             is AppState.Error -> {
-                binding.loadingLayout.visibility=View.GONE
-                Snackbar.make(binding.mainViewContainer,"Ошибка",Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Перегрузить",{viewModel.getWeatherLocal()})
+                binding.loadingLayout.visibility = View.GONE
+                Snackbar.make(binding.mainViewContainer, "Ошибка", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Перегрузить", { viewModel.getWeatherLocal(null) })
                     .show()
             }
             is AppState.Loading -> {
-                binding.loadingLayout.visibility=View.VISIBLE
+                binding.loadingLayout.visibility = View.VISIBLE
             }
         }
 
     }
 
     private fun setData(weather: Weather) {
-        binding.date.text = weather.getDateString()//weather.date.toString()//java.util.Calendar.getInstance(Locale.getDefault()).time.toString()
-        binding.tempLabel.text= resources.getString(R.string.temp_label)
-        binding.tempFeelLabel.text= resources.getString(R.string.feeled_label)
+        binding.date.text =
+            weather.getDateString()//weather.date.toString()//java.util.Calendar.getInstance(Locale.getDefault()).time.toString()
+        binding.tempLabel.text = resources.getString(R.string.temp_label)
+        binding.tempFeelLabel.text = resources.getString(R.string.feeled_label)
         binding.cityName.text = weather.city.city
-        binding.coordinates.text= String.format(Locale.getDefault(),"lt/ln: ${weather.city.lat},${weather.city.lon}")
+        binding.coordinates.text =
+            String.format(Locale.getDefault(), "${resources.getString(R.string.coordinates_label)}: ${weather.city.lat},${weather.city.lon}")
         binding.temperature.text = weather.temperature.toString()
         binding.tempFeel.text = weather.feelsLike.toString()
 
@@ -115,6 +143,6 @@ class MainFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding=null
+        _binding = null
     }
 }

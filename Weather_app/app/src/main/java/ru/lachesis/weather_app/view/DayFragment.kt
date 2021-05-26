@@ -7,9 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import ru.lachesis.weather_app.R
 import ru.lachesis.weather_app.databinding.DayFragmentBinding
 import ru.lachesis.weather_app.model.Weather
 import ru.lachesis.weather_app.viewmodel.DayViewModel
@@ -25,7 +23,7 @@ class DayFragment : Fragment() {
     private val binding
         get()=_binding!!
     private lateinit var recyclerView : RecyclerView
-    private val adapter: CustomRecyclerAdapter = CustomRecyclerAdapter()
+    private val adapter: DayRecyclerAdapter = DayRecyclerAdapter()
 
 
     override fun onCreateView(
