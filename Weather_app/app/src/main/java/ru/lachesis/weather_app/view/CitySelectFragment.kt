@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import ru.lachesis.weather_app.R
@@ -17,6 +16,7 @@ import ru.lachesis.weather_app.model.Weather
 class CitySelectFragment : Fragment() {
 
     private val recyclerView : RecyclerView by lazy { binding.citySelectRecycler }
+    private var isDataSetRus: Boolean = true
     private val adapter: CitySelectAdapter = CitySelectAdapter(object: OnItemViewClickListener{
         override fun click(weather: Weather) {
             val bundle = Bundle()
@@ -51,6 +51,26 @@ class CitySelectFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.citySelectFAB.setOnClickListener  {changeWeatherDataSet()}
+        viewModel = ViewModelProvider(this).get(CitySelectViewModel::class.java)
+        adapter.setWeatherData(viewModel.getCityList(isDataSetRus))
+        viewModel.getLiveData().observe(viewLifecycleOwner, Observer { RenderData(it) })
+        recyclerView.adapter = adapter
+    }
+
+    private fun changeWeatherDataSet() {
+        if (isDataSetRus) {
+            binding.citySelectFAB.setImageResource(R.drawable.ic_earth)
+        } else {
+            binding.citySelectFAB.setImageResource(R.drawable.ic_russia)
+        }
+        isDataSetRus = !isDataSetRus
+        viewModel.getCityList(isDataSetRus)
+    }
+
+    /*
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(CitySelectViewModel::class.java)
@@ -60,6 +80,7 @@ class CitySelectFragment : Fragment() {
 
         // TODO: Use the ViewModel
     }
+*/
     override fun onDestroy() {
         adapter.removeListener()
         super.onDestroy()
