@@ -11,9 +11,10 @@ import ru.lachesis.weather_app.viewmodel.MainViewModel
 
 import ru.lachesis.weather_app.model.Weather
 import ru.lachesis.weather_app.viewmodel.AppState
+import java.text.SimpleDateFormat
 import java.util.*
 
-class MainFragment  : Fragment() {
+class MainFragment : Fragment() {
 
     companion object {
         const val BUNDLE_EXTRA = "weather"
@@ -58,9 +59,9 @@ class MainFragment  : Fragment() {
 */
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         val liveData = viewModel.getLiveData()
-            liveData.observe(viewLifecycleOwner, { renderData(it) })//Observer { renderData(it) })
+        liveData.observe(viewLifecycleOwner, { renderData(it) })//Observer { renderData(it) })
 //        if (weather==null)
-            viewModel.getWeatherLocal(weather)
+        viewModel.getWeatherLocal(weather)
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(binding.dayFragmentContainer.id, DayFragment.newInstance()).commit()
 
@@ -106,6 +107,15 @@ class MainFragment  : Fragment() {
 //        viewModel.getWeatherLocal()
 //    }
 
+    private fun View.showSnakeBar(
+        text: String,
+        actionText: String,
+        action: (View) -> Unit,
+        length: Int = Snackbar.LENGTH_INDEFINITE
+    ) {
+        Snackbar.make(this, text, length).setAction(actionText, action).show()
+    }
+
     private fun renderData(appState: AppState?) {
         when (appState) {
             is AppState.Success -> {
@@ -115,9 +125,10 @@ class MainFragment  : Fragment() {
             }
             is AppState.Error -> {
                 binding.loadingLayout.visibility = View.GONE
-                Snackbar.make(binding.mainViewContainer, "Ошибка", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("Перегрузить", { viewModel.getWeatherLocal(null) })
-                    .show()
+                binding.mainViewContainer.showSnakeBar("Ошибка","Перегрузить",{viewModel.getWeatherLocal(null)})
+//                Snackbar.make(binding.mainViewContainer, "Ошибка", Snackbar.LENGTH_INDEFINITE)
+//                    .setAction("Перегрузить", { viewModel.getWeatherLocal(null) })
+//                    .show()
             }
             is AppState.Loading -> {
                 binding.loadingLayout.visibility = View.VISIBLE
@@ -133,7 +144,10 @@ class MainFragment  : Fragment() {
         binding.tempFeelLabel.text = resources.getString(R.string.feeled_label)
         binding.cityName.text = weather.city.city
         binding.coordinates.text =
-            String.format(Locale.getDefault(), "${resources.getString(R.string.coordinates_label)}: ${weather.city.lat},${weather.city.lon}")
+            String.format(
+                Locale.getDefault(),
+                "${resources.getString(R.string.coordinates_label)}: ${weather.city.lat},${weather.city.lon}"
+            )
         binding.temperature.text = weather.temperature.toString()
         binding.tempFeel.text = weather.feelsLike.toString()
 
