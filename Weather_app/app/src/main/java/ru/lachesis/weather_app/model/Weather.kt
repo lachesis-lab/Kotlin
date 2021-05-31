@@ -9,10 +9,17 @@ import kotlinx.android.parcel.Parcelize
 data class Weather(
     val city: City = getDefaultCity(),
     val date: Date = Calendar.getInstance(Locale.getDefault()).time,
-    val temperature: Int = 0,
-    val feelsLike: Int = 0
+    var temperature: Int = 0,
+    var feelsLike: Int = 0,
+    var condition: String?=""
 ) : Parcelable
 {
+    constructor (weatherDTO: WeatherDTO) : this() {
+        this.temperature = weatherDTO.fact?.temp?:0
+        this.feelsLike = weatherDTO.fact?.feels_like?:0
+        this.condition = weatherDTO.fact?.condition?:""
+
+    }
     fun getDateString(): String {
         return java.text.SimpleDateFormat.getDateTimeInstance(3, 3, Locale.getDefault())
             .format(date)

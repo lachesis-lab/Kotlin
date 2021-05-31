@@ -1,8 +1,10 @@
 package ru.lachesis.weather_app.view
 
-import androidx.lifecycle.ViewModelProvider
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import ru.lachesis.weather_app.R
@@ -10,8 +12,9 @@ import ru.lachesis.weather_app.databinding.MainFragmentBinding
 import ru.lachesis.weather_app.viewmodel.MainViewModel
 
 import ru.lachesis.weather_app.model.Weather
+import ru.lachesis.weather_app.model.WeatherDTO
+import ru.lachesis.weather_app.view.WeatherLoader.WeatherLoadListener
 import ru.lachesis.weather_app.viewmodel.AppState
-import java.text.SimpleDateFormat
 import java.util.*
 
 class MainFragment : Fragment() {
@@ -25,8 +28,20 @@ class MainFragment : Fragment() {
         }
     }
 
+    private val onLoadListener: WeatherLoadListener = object : WeatherLoadListener {
+        override fun onFailed(error: Throwable) {
+            Log.e("LoadingError",error.message.toString())
+        }
+
+        override fun onLoaded(weatherDTO: WeatherDTO) {
+            setData(Weather(weatherDTO))
+        }
+    }
+
+
     private lateinit var viewModel: MainViewModel
 
+    private lateinit var weatherBundle: Weather
     private var _binding: MainFragmentBinding? = null
 
     private val binding: MainFragmentBinding
@@ -40,28 +55,33 @@ class MainFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 */
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    @RequiresApi(Build.VERSION_CODES.N)
+override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val weather = arguments?.getParcelable<Weather>(BUNDLE_EXTRA)
+        weatherBundle = arguments?.getParcelable<Weather>(BUNDLE_EXTRA) ?: Weather()
 /*
-        if (weather != null) {
-            val city = weather.city
+        if (weatherBundle != null) {
+            val city = weatherBundle.city
             binding.cityName.text = city.city
             binding.coordinates.text = String.format(
                 getString(R.string.coordinates_label),
                 city.lat.toString(),
                 city.lon.toString()
             )
-            binding.temperature.text = weather.temperature.toString()
-            binding.tempFeel.text = weather.feelsLike.toString()
+            binding.temperature.text = weatherBundle.temperature.toString()
+            binding.tempFeel.text = weatherBundle.feelsLike.toString()
         }
 */
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
+//        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        val loader = WeatherLoader(onLoadListener, weatherBundle.city.lat,weatherBundle.city.lon)
+        loader.loadWeather()
+/*
         val liveData = viewModel.getLiveData()
         liveData.observe(viewLifecycleOwner, { renderData(it) })//Observer { renderData(it) })
 //        if (weather==null)
         viewModel.getWeatherLocal(weather)
+*/
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(binding.dayFragmentContainer.id, DayFragment.newInstance()).commit()
 
@@ -142,14 +162,15 @@ class MainFragment : Fragment() {
             weather.getDateString()//weather.date.toString()//java.util.Calendar.getInstance(Locale.getDefault()).time.toString()
         binding.tempLabel.text = resources.getString(R.string.temp_label)
         binding.tempFeelLabel.text = resources.getString(R.string.feeled_label)
-        binding.cityName.text = weather.city.city
+        binding.cityName.text = weatherBundle.city.city
         binding.coordinates.text =
             String.format(
                 Locale.getDefault(),
-                "${resources.getString(R.string.coordinates_label)}: ${weather.city.lat},${weather.city.lon}"
+                "${resources.getString(R.string.coordinates_label)}: ${weatherBundle.city.lat},${weatherBundle.city.lon}"
             )
         binding.temperature.text = weather.temperature.toString()
         binding.tempFeel.text = weather.feelsLike.toString()
+        binding.condition.text = weather.condition
 
 
     }

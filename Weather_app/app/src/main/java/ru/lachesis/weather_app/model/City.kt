@@ -11,5 +11,5 @@ data class City (
 ): Parcelable
 
 public fun getDefaultCity(): City {
-    return City("Москва", 33.021212, 88.0898)
+    return City("Москва", 55.755826, 37.617299900000035)
 }
