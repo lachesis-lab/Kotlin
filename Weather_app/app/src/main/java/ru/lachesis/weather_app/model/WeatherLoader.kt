@@ -1,23 +1,20 @@
-package ru.lachesis.weather_app.view
+package ru.lachesis.weather_app.model
 
 import android.os.Build
 import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import ru.lachesis.weather_app.BuildConfig
-import ru.lachesis.weather_app.model.WeatherDTO
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.URL
-import java.net.URLConnection
 import java.util.stream.Collectors
 import javax.net.ssl.HttpsURLConnection
 import kotlin.Exception
 
 class WeatherLoader(
-    private val listener: WeatherLoadListener,
+    private val listener: Repository.WeatherLoadListener,
     private val lat: Double,
     private val lon: Double
 ) {
@@ -34,14 +31,12 @@ class WeatherLoader(
                     urlConnection.requestMethod = "GET"
                     urlConnection.addRequestProperty(
                         "X-Yandex-API-Key",
-                        //com.example.androidwithkotlin.
                         BuildConfig.WEATHER_API_KEY
                     )
                     urlConnection.readTimeout = 10000
                     val bufferedReader =
                         BufferedReader(InputStreamReader(urlConnection.inputStream))
 
-                    // преобразование ответа от сервера (JSON) в модель данных (WeatherDTO)
                     val weatherDTO: WeatherDTO =
                         Gson().fromJson(getLines(bufferedReader), WeatherDTO::class.java)
                     handler.post { listener.onLoaded(weatherDTO) }
@@ -67,8 +62,6 @@ class WeatherLoader(
         return reader.lines().collect(Collectors.joining("\n"))
     }
 
-    interface WeatherLoadListener {
-        fun onLoaded(weatherDTO: WeatherDTO)
-        fun onFailed(error: Throwable)
-    }
+
+
 }

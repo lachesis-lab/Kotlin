@@ -2,19 +2,16 @@ package ru.lachesis.weather_app.view
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import ru.lachesis.weather_app.R
 import ru.lachesis.weather_app.databinding.MainFragmentBinding
-import ru.lachesis.weather_app.viewmodel.MainViewModel
-
 import ru.lachesis.weather_app.model.Weather
-import ru.lachesis.weather_app.model.WeatherDTO
-import ru.lachesis.weather_app.view.WeatherLoader.WeatherLoadListener
 import ru.lachesis.weather_app.viewmodel.AppState
+import ru.lachesis.weather_app.viewmodel.MainViewModel
 import java.util.*
 
 class MainFragment : Fragment() {
@@ -25,16 +22,6 @@ class MainFragment : Fragment() {
             val fragment = MainFragment()
             fragment.arguments = bundle
             return fragment
-        }
-    }
-
-    private val onLoadListener: WeatherLoadListener = object : WeatherLoadListener {
-        override fun onFailed(error: Throwable) {
-            Log.e("LoadingError",error.message.toString())
-        }
-
-        override fun onLoaded(weatherDTO: WeatherDTO) {
-            setData(Weather(weatherDTO))
         }
     }
 
@@ -73,15 +60,15 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         }
 */
 
-//        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        val loader = WeatherLoader(onLoadListener, weatherBundle.city.lat,weatherBundle.city.lon)
-        loader.loadWeather()
-/*
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+//        val loader = WeatherLoader(onLoadListener, weatherBundle.city.lat,weatherBundle.city.lon)
+//        loader.loadWeather()
+
         val liveData = viewModel.getLiveData()
         liveData.observe(viewLifecycleOwner, { renderData(it) })//Observer { renderData(it) })
 //        if (weather==null)
-        viewModel.getWeatherLocal(weather)
-*/
+        viewModel.getWeatherRemote(weatherBundle)
+
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(binding.dayFragmentContainer.id, DayFragment.newInstance()).commit()
 
@@ -91,7 +78,7 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = MainFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
