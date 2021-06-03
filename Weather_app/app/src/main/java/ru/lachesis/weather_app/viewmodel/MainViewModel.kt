@@ -1,9 +1,16 @@
 package ru.lachesis.weather_app.viewmodel
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.IBinder
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.lachesis.weather_app.model.*
+import ru.lachesis.weather_app.view.WEATHER_BROADCAST_EXTRA
+
 
 class MainViewModel(
     private val liveDataToObserve: MutableLiveData<AppState> = MutableLiveData(),
@@ -36,8 +43,31 @@ class MainViewModel(
 
     private fun getRemoteData(weather: Weather?) {
         liveDataToObserve.value = AppState.Loading
-        liveDataToObserve.postValue(AppState.Success(repository.getRemoteData(weather,listener)))
+//        liveDataToObserve.postValue(AppState.Success(repository.getRemoteData(weather,listener)))
+//        liveDataToObserve.postValue((AppState.Success(bindService,))
     }
+/*
+    public fun bindService(weather: Weather){
+        val intent = Intent(context, WeatherIntentService::class.java)
+        intent.putExtra(WEATHER_BROADCAST_EXTRA,weather)
+        val service= WeatherIntentService.ServiceBinder()
+        val conn = object: ServiceConnection {
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                val weatherService = service as WeatherIntentService.ServiceBinder
+            }
+
+            override fun onServiceDisconnected(name: ComponentName?) {
+                //weatherService = null
+            }
+
+        }
+
+        val binder = weatherService.getService().bindService(intent,conn, Context.BIND_AUTO_CREATE)
+
+//        service.unbindService(binder.)
+
+    }
+*/
 
 /*
     interface WeatherLoadListener {

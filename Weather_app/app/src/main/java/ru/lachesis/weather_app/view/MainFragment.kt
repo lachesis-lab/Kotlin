@@ -1,7 +1,9 @@
 package ru.lachesis.weather_app.view
 
+import android.content.*
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.view.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
@@ -10,11 +12,48 @@ import com.google.android.material.snackbar.Snackbar
 import ru.lachesis.weather_app.R
 import ru.lachesis.weather_app.databinding.MainFragmentBinding
 import ru.lachesis.weather_app.model.Weather
+import ru.lachesis.weather_app.model.WeatherIntentService
 import ru.lachesis.weather_app.viewmodel.AppState
 import ru.lachesis.weather_app.viewmodel.MainViewModel
 import java.util.*
 
+public const val WEATHER_BROADCAST_INTENT_FILTER = "ru.lachesis.weather_app.broadcast_intent_filter"
+public const val WEATHER_BROADCAST_EXTRA = "ru.lachesis.weather_app.weather_broadcast_extra"
+
 class MainFragment : Fragment() {
+
+    private var weatherService: WeatherIntentService? = null
+    private lateinit var weatherServiceBinder: WeatherIntentService.ServiceBinder
+        //WeatherIntentService.ServiceBinder()
+
+    private var conn: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            weatherServiceBinder = service as WeatherIntentService.ServiceBinder
+            weatherService = weatherServiceBinder.getService()
+            isBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+ //           weatherServiceBinder = null
+            isBound = false
+        }
+    }
+    var isBound: Boolean = false
+    private lateinit var viewModel: MainViewModel
+
+    private lateinit var weatherBundle: Weather
+    private var _binding: MainFragmentBinding? = null
+
+    private val binding: MainFragmentBinding
+        get() = _binding!!
+
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val weather = intent?.getParcelableExtra<Weather>(WEATHER_BROADCAST_EXTRA)
+
+            Thread(Runnable { weather?.let { setData(it) } })
+        }
+    }
 
     companion object {
         const val BUNDLE_EXTRA = "weather"
@@ -26,16 +65,7 @@ class MainFragment : Fragment() {
     }
 
 
-    private lateinit var viewModel: MainViewModel
-
-    private lateinit var weatherBundle: Weather
-    private var _binding: MainFragmentBinding? = null
-
-    private val binding: MainFragmentBinding
-        get() = _binding!!
-
-
-/*
+    /*
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -43,7 +73,7 @@ class MainFragment : Fragment() {
     }
 */
     @RequiresApi(Build.VERSION_CODES.N)
-override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         weatherBundle = arguments?.getParcelable<Weather>(BUNDLE_EXTRA) ?: Weather()
 /*
@@ -63,11 +93,13 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 //        val loader = WeatherLoader(onLoadListener, weatherBundle.city.lat,weatherBundle.city.lon)
 //        loader.loadWeather()
+        bindWeatherService(weatherBundle)
+//        weatherService.get
 
         val liveData = viewModel.getLiveData()
         liveData.observe(viewLifecycleOwner, { renderData(it) })//Observer { renderData(it) })
 //        if (weather==null)
-        viewModel.getWeatherRemote(weatherBundle)
+        //viewModel.getWeatherRemote(weatherBundle)
 
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(binding.dayFragmentContainer.id, DayFragment.newInstance()).commit()
@@ -82,6 +114,7 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = MainFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
+
 
     override fun onCreateContextMenu(
         menu: ContextMenu,
@@ -105,6 +138,7 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         return true
     }
+
 
 //    override fun onActivityCreated(savedInstanceState: Bundle?) {
 //        super.onActivityCreated(savedInstanceState)
@@ -132,7 +166,10 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             }
             is AppState.Error -> {
                 binding.loadingLayout.visibility = View.GONE
-                binding.mainViewContainer.showSnakeBar("Ошибка","Перегрузить",{viewModel.getWeatherLocal(null)})
+                binding.mainViewContainer.showSnakeBar(
+                    "Ошибка",
+                    "Перегрузить",
+                    { viewModel.getWeatherLocal(null) })
 //                Snackbar.make(binding.mainViewContainer, "Ошибка", Snackbar.LENGTH_INDEFINITE)
 //                    .setAction("Перегрузить", { viewModel.getWeatherLocal(null) })
 //                    .show()
@@ -162,9 +199,25 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
     }
 
+    override fun onStop() {
+        super.onStop()
+        context?.unregisterReceiver(receiver)
+        context?.unbindService(conn)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+    fun bindWeatherService(weather: Weather) {
+        val intent = Intent(requireActivity(), WeatherIntentService::class.java)
+        intent.putExtra(WEATHER_BROADCAST_EXTRA, weatherBundle)
+
+        requireActivity().bindService(intent, conn, Context.BIND_AUTO_CREATE)
+
+//        service.unbindService(binder.)
+
+    }
+
 }
