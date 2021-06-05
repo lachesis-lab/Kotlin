@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Weather_app">
         <service
-            android:name=".model.WeatherIntentService"
+            android:name=".model.WeatherService"
             android:exported="false"/>
 
         <activity android:name=".view.MainActivity">

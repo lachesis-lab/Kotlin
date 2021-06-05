@@ -1,20 +1,21 @@
 package ru.lachesis.weather_app.view
 
 import android.content.*
-import android.os.Build
-import android.os.Bundle
-import android.os.IBinder
+import android.os.*
 import android.view.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.material.snackbar.Snackbar
 import ru.lachesis.weather_app.R
 import ru.lachesis.weather_app.databinding.MainFragmentBinding
 import ru.lachesis.weather_app.model.Weather
-import ru.lachesis.weather_app.model.WeatherIntentService
+import ru.lachesis.weather_app.model.WeatherService
 import ru.lachesis.weather_app.viewmodel.AppState
 import ru.lachesis.weather_app.viewmodel.MainViewModel
+import java.lang.Exception
 import java.util.*
 
 public const val WEATHER_BROADCAST_INTENT_FILTER = "ru.lachesis.weather_app.broadcast_intent_filter"
@@ -22,19 +23,22 @@ public const val WEATHER_BROADCAST_EXTRA = "ru.lachesis.weather_app.weather_broa
 
 class MainFragment : Fragment() {
 
-    private var weatherService: WeatherIntentService? = null
-    private lateinit var weatherServiceBinder: WeatherIntentService.ServiceBinder
-        //WeatherIntentService.ServiceBinder()
+    private lateinit var thread: HandlerThread
+    private lateinit var handler: Handler
+    private lateinit var weatherService: WeatherService
+    lateinit var liveData: MutableLiveData<AppState>
 
-    private var conn: ServiceConnection = object : ServiceConnection {
+    private val conn: ServiceConnection = object : ServiceConnection {
+        @RequiresApi(Build.VERSION_CODES.N)
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            weatherServiceBinder = service as WeatherIntentService.ServiceBinder
+            val weatherServiceBinder = service as WeatherService.ServiceBinder
             weatherService = weatherServiceBinder.getService()
             isBound = true
+            weatherService.sendIntent(weatherBundle)
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
- //           weatherServiceBinder = null
+            //           weatherServiceBinder = null
             isBound = false
         }
     }
@@ -47,11 +51,19 @@ class MainFragment : Fragment() {
     private val binding: MainFragmentBinding
         get() = _binding!!
 
+
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            val weather = intent?.getParcelableExtra<Weather>(WEATHER_BROADCAST_EXTRA)
 
-            Thread(Runnable { weather?.let { setData(it) } })
+            val weather = intent?.getParcelableExtra<Weather>(WEATHER_BROADCAST_EXTRA)
+//            requireActivity().runOnUiThread(Runnable {
+                try {
+                    liveData.value = AppState.Success(weather!!)
+                } catch (e: Exception) {
+                    liveData.value = AppState.Error(e)
+
+                }
+//            })
         }
     }
 
@@ -65,38 +77,44 @@ class MainFragment : Fragment() {
     }
 
 
-    /*
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setHasOptionsMenu(true)
+        thread = HandlerThread("WeatherServiceThread")
+        thread.start()
+        val looper = thread.getLooper()
+        handler = Handler(looper)
+        handler.run {
+            context?.let {
+                LocalBroadcastManager.getInstance(it)
+                    .registerReceiver(receiver, IntentFilter(WEATHER_BROADCAST_INTENT_FILTER))
+            }
+        }
     }
-*/
+
+    override fun onDestroy() {
+        context?.let {
+            LocalBroadcastManager.getInstance(it).unregisterReceiver(receiver)
+        }
+        super.onDestroy()
+    }
+
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         weatherBundle = arguments?.getParcelable<Weather>(BUNDLE_EXTRA) ?: Weather()
-/*
-        if (weatherBundle != null) {
-            val city = weatherBundle.city
-            binding.cityName.text = city.city
-            binding.coordinates.text = String.format(
-                getString(R.string.coordinates_label),
-                city.lat.toString(),
-                city.lon.toString()
-            )
-            binding.temperature.text = weatherBundle.temperature.toString()
-            binding.tempFeel.text = weatherBundle.feelsLike.toString()
+//        bindWeatherService(weatherBundle)
+        context?.let {
+            LocalBroadcastManager.getInstance(it)
+                .registerReceiver(receiver, IntentFilter(WEATHER_BROADCAST_INTENT_FILTER))
         }
-*/
+        bindWeatherService(weatherBundle)
+        if (isBound)
+            weatherService.sendIntent(weatherBundle)
+
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-//        val loader = WeatherLoader(onLoadListener, weatherBundle.city.lat,weatherBundle.city.lon)
-//        loader.loadWeather()
-        bindWeatherService(weatherBundle)
-//        weatherService.get
 
-        val liveData = viewModel.getLiveData()
+        liveData = viewModel.getLiveData()
         liveData.observe(viewLifecycleOwner, { renderData(it) })//Observer { renderData(it) })
 //        if (weather==null)
         //viewModel.getWeatherRemote(weatherBundle)
@@ -139,7 +157,9 @@ class MainFragment : Fragment() {
         return true
     }
 
-
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+    }
 //    override fun onActivityCreated(savedInstanceState: Bundle?) {
 //        super.onActivityCreated(savedInstanceState)
 //        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -158,6 +178,7 @@ class MainFragment : Fragment() {
     }
 
     private fun renderData(appState: AppState?) {
+
         when (appState) {
             is AppState.Success -> {
                 val weather = appState.weather
@@ -201,7 +222,7 @@ class MainFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        context?.unregisterReceiver(receiver)
+//        context?.unregisterReceiver(receiver)
         context?.unbindService(conn)
     }
 
@@ -210,13 +231,11 @@ class MainFragment : Fragment() {
         _binding = null
     }
 
-    fun bindWeatherService(weather: Weather) {
-        val intent = Intent(requireActivity(), WeatherIntentService::class.java)
-        intent.putExtra(WEATHER_BROADCAST_EXTRA, weatherBundle)
+    fun bindWeatherService(weather: Weather?) {
+        val intent = Intent(requireActivity(), WeatherService::class.java)
+        intent.putExtra(WEATHER_BROADCAST_EXTRA, weather)
 
         requireActivity().bindService(intent, conn, Context.BIND_AUTO_CREATE)
-
-//        service.unbindService(binder.)
 
     }
 

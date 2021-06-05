@@ -1,15 +1,15 @@
 package ru.lachesis.weather_app.viewmodel
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
-import android.os.IBinder
+import android.app.Activity
+import android.app.Application
+import android.content.res.Resources
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ru.lachesis.weather_app.model.*
-import ru.lachesis.weather_app.view.WEATHER_BROADCAST_EXTRA
+import ru.lachesis.weather_app.model.Repository
+import ru.lachesis.weather_app.model.RepositoryImpl
+import ru.lachesis.weather_app.model.Weather
+import ru.lachesis.weather_app.model.WeatherDTO
 
 
 class MainViewModel(
@@ -42,7 +42,9 @@ class MainViewModel(
     }
 
     private fun getRemoteData(weather: Weather?) {
+
         liveDataToObserve.value = AppState.Loading
+
 //        liveDataToObserve.postValue(AppState.Success(repository.getRemoteData(weather,listener)))
 //        liveDataToObserve.postValue((AppState.Success(bindService,))
     }
