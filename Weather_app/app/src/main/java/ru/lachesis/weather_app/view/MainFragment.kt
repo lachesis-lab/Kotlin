@@ -23,8 +23,6 @@ public const val WEATHER_BROADCAST_EXTRA = "ru.lachesis.weather_app.weather_broa
 
 class MainFragment : Fragment() {
 
-    private lateinit var thread: HandlerThread
-    private lateinit var handler: Handler
     private lateinit var weatherService: WeatherService
     lateinit var liveData: MutableLiveData<AppState>
 
@@ -56,14 +54,12 @@ class MainFragment : Fragment() {
         override fun onReceive(context: Context?, intent: Intent?) {
 
             val weather = intent?.getParcelableExtra<Weather>(WEATHER_BROADCAST_EXTRA)
-//            requireActivity().runOnUiThread(Runnable {
                 try {
                     liveData.value = AppState.Success(weather!!)
                 } catch (e: Exception) {
                     liveData.value = AppState.Error(e)
 
                 }
-//            })
         }
     }
 
@@ -79,16 +75,10 @@ class MainFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        thread = HandlerThread("WeatherServiceThread")
-        thread.start()
-        val looper = thread.getLooper()
-        handler = Handler(looper)
-        handler.run {
             context?.let {
                 LocalBroadcastManager.getInstance(it)
                     .registerReceiver(receiver, IntentFilter(WEATHER_BROADCAST_INTENT_FILTER))
             }
-        }
     }
 
     override fun onDestroy() {
@@ -156,17 +146,6 @@ class MainFragment : Fragment() {
 
         return true
     }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-    }
-//    override fun onActivityCreated(savedInstanceState: Bundle?) {
-//        super.onActivityCreated(savedInstanceState)
-//        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-//        viewModel.getLiveData()
-//            .observe(viewLifecycleOwner, { renderData(it) })//Observer { renderData(it) })
-//        viewModel.getWeatherLocal()
-//    }
 
     private fun View.showSnakeBar(
         text: String,

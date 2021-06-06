@@ -11,9 +11,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Weather_app">
+        <receiver
+            android:name=".view.TestReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".model.WeatherService"
-            android:exported="false"/>
+            android:exported="false" />
 
         <activity android:name=".view.MainActivity">
             <intent-filter>
