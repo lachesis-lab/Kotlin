@@ -19,7 +19,7 @@ data class Weather(
         this.temperature = weatherDTO.fact?.temp?:0
         this.feelsLike = weatherDTO.fact?.feels_like?:0
         this.condition = weatherDTO.fact?.condition?:""
-        this.icon = weatherDTO.fact?.icon
+        this.icon = weatherDTO.fact?.icon?:""
 
     }
     fun getDateString(): String {

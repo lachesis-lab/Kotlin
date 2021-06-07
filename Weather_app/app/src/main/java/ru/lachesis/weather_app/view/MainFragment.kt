@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import com.google.android.material.snackbar.Snackbar
+import com.squareup.picasso.Picasso
 import ru.lachesis.weather_app.R
 import ru.lachesis.weather_app.databinding.MainFragmentBinding
 import ru.lachesis.weather_app.model.Weather
@@ -204,6 +205,10 @@ class MainFragment : Fragment() {
         binding.temperature.text = weather.temperature.toString()
         binding.tempFeel.text = weather.feelsLike.toString()
         binding.condition.text = weather.condition
+
+        Picasso.get()
+            .load("https://freepngimg.com/thumb/city/36275-3-city-hd.png")
+            .into(binding.headerIcon)
 
 
     }
