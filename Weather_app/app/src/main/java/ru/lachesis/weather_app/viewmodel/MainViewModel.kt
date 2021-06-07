@@ -1,20 +1,23 @@
 package ru.lachesis.weather_app.viewmodel
 
-import android.app.Activity
-import android.app.Application
-import android.content.res.Resources
+import android.media.MediaRouter
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ru.lachesis.weather_app.model.Repository
-import ru.lachesis.weather_app.model.RepositoryImpl
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import ru.lachesis.weather_app.model.Weather
 import ru.lachesis.weather_app.model.WeatherDTO
+import ru.lachesis.weather_app.repository.*
 
+private const val SERVER_ERROR = "Ошибка сервера"
+private const val REQUEST_ERROR = "Ошибка запроса на сервер"
 
 class MainViewModel(
     private val liveDataToObserve: MutableLiveData<AppState> = MutableLiveData(),
-    private val repository : Repository = RepositoryImpl()
+    private val localRepository : Repository = RepositoryImpl(),
+    private val remoteRepository: MainRepository = MainRepositoryImpl(RemoteDataSource())
 ) : ViewModel() {
 
     private val listener: Repository.WeatherLoadListener = object: Repository.WeatherLoadListener {
@@ -35,7 +38,7 @@ class MainViewModel(
         liveDataToObserve.value = AppState.Loading
         Thread {
             Thread.sleep(1000)
-            liveDataToObserve.postValue(AppState.Success(repository.getLocalData(weather)))
+            liveDataToObserve.postValue(AppState.Success(localRepository.getLocalData(weather)))
         }.start()
 
 
@@ -44,32 +47,23 @@ class MainViewModel(
     private fun getRemoteData(weather: Weather?) {
 
         liveDataToObserve.value = AppState.Loading
+        remoteRepository.getWeatherFromAPI(weather?.city!!.lat,weather.city.lon,callback = object : Callback<WeatherDTO>{
+            override fun onResponse(call: Call<WeatherDTO>, response: Response<WeatherDTO>) {
+                val responseWeather: WeatherDTO? = response.body()
+                if (response.isSuccessful && responseWeather!=null)
+                    liveDataToObserve.value = AppState.Success(Weather(responseWeather))
+                else
+                    liveDataToObserve.value = AppState.Error(Exception(SERVER_ERROR))
+            }
 
+            override fun onFailure(call: Call<WeatherDTO>, t: Throwable) {
+                liveDataToObserve.value = AppState.Error(Exception(REQUEST_ERROR))
+            }
+        })
+//        liveDataToObserve.postValue(AppState.Success(remoteRepository.getWeatherFromAPI(weather.city.lat,weather.city.lon,callback))
 //        liveDataToObserve.postValue(AppState.Success(repository.getRemoteData(weather,listener)))
 //        liveDataToObserve.postValue((AppState.Success(bindService,))
     }
-/*
-    public fun bindService(weather: Weather){
-        val intent = Intent(context, WeatherIntentService::class.java)
-        intent.putExtra(WEATHER_BROADCAST_EXTRA,weather)
-        val service= WeatherIntentService.ServiceBinder()
-        val conn = object: ServiceConnection {
-            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                val weatherService = service as WeatherIntentService.ServiceBinder
-            }
-
-            override fun onServiceDisconnected(name: ComponentName?) {
-                //weatherService = null
-            }
-
-        }
-
-        val binder = weatherService.getService().bindService(intent,conn, Context.BIND_AUTO_CREATE)
-
-//        service.unbindService(binder.)
-
-    }
-*/
 
 /*
     interface WeatherLoadListener {

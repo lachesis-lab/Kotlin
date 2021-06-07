@@ -1,6 +1,7 @@
 package ru.lachesis.weather_app.view
 
 import android.content.*
+import android.net.Uri
 import android.os.*
 import android.view.*
 import androidx.annotation.RequiresApi
@@ -8,11 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import com.google.android.material.snackbar.Snackbar
 import ru.lachesis.weather_app.R
 import ru.lachesis.weather_app.databinding.MainFragmentBinding
 import ru.lachesis.weather_app.model.Weather
-import ru.lachesis.weather_app.model.WeatherService
+import ru.lachesis.weather_app.repository.WeatherService
 import ru.lachesis.weather_app.viewmodel.AppState
 import ru.lachesis.weather_app.viewmodel.MainViewModel
 import java.lang.Exception
@@ -54,12 +56,12 @@ class MainFragment : Fragment() {
         override fun onReceive(context: Context?, intent: Intent?) {
 
             val weather = intent?.getParcelableExtra<Weather>(WEATHER_BROADCAST_EXTRA)
-                try {
-                    liveData.value = AppState.Success(weather!!)
-                } catch (e: Exception) {
-                    liveData.value = AppState.Error(e)
+            try {
+                liveData.value = AppState.Success(weather!!)
+            } catch (e: Exception) {
+                liveData.value = AppState.Error(e)
 
-                }
+            }
         }
     }
 
@@ -75,10 +77,10 @@ class MainFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-            context?.let {
-                LocalBroadcastManager.getInstance(it)
-                    .registerReceiver(receiver, IntentFilter(WEATHER_BROADCAST_INTENT_FILTER))
-            }
+        context?.let {
+            LocalBroadcastManager.getInstance(it)
+                .registerReceiver(receiver, IntentFilter(WEATHER_BROADCAST_INTENT_FILTER))
+        }
     }
 
     override fun onDestroy() {
@@ -92,7 +94,7 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         weatherBundle = arguments?.getParcelable<Weather>(BUNDLE_EXTRA) ?: Weather()
-//        bindWeatherService(weatherBundle)
+/* from service
         context?.let {
             LocalBroadcastManager.getInstance(it)
                 .registerReceiver(receiver, IntentFilter(WEATHER_BROADCAST_INTENT_FILTER))
@@ -100,6 +102,7 @@ class MainFragment : Fragment() {
         bindWeatherService(weatherBundle)
         if (isBound)
             weatherService.sendIntent(weatherBundle)
+*/
 
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -107,7 +110,7 @@ class MainFragment : Fragment() {
         liveData = viewModel.getLiveData()
         liveData.observe(viewLifecycleOwner, { renderData(it) })//Observer { renderData(it) })
 //        if (weather==null)
-        //viewModel.getWeatherRemote(weatherBundle)
+        viewModel.getWeatherRemote(weatherBundle)
 
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(binding.dayFragmentContainer.id, DayFragment.newInstance()).commit()
@@ -182,8 +185,7 @@ class MainFragment : Fragment() {
     }
 
     private fun setData(weather: Weather) {
-        binding.date.text =
-            weather.getDateString()//weather.date.toString()//java.util.Calendar.getInstance(Locale.getDefault()).time.toString()
+        binding.date.text = weather.getDateString()
         binding.tempLabel.text = resources.getString(R.string.temp_label)
         binding.tempFeelLabel.text = resources.getString(R.string.feeled_label)
         binding.cityName.text = weatherBundle.city.city
@@ -192,24 +194,32 @@ class MainFragment : Fragment() {
                 Locale.getDefault(),
                 "${resources.getString(R.string.coordinates_label)}: ${weatherBundle.city.lat},${weatherBundle.city.lon}"
             )
+        weather.icon?.let {
+            GlideToVectorYou.justLoadImage(
+                activity,
+                Uri.parse("https://yastatic.net/weather/i/icons/blueye/color/svg/${it}.svg"),
+                binding.weatherIcon
+            )
+        }
         binding.temperature.text = weather.temperature.toString()
         binding.tempFeel.text = weather.feelsLike.toString()
         binding.condition.text = weather.condition
 
 
     }
-
+/* from service
     override fun onStop() {
         super.onStop()
 //        context?.unregisterReceiver(receiver)
         context?.unbindService(conn)
-    }
+    }*/
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
+/* from service
     fun bindWeatherService(weather: Weather?) {
         val intent = Intent(requireActivity(), WeatherService::class.java)
         intent.putExtra(WEATHER_BROADCAST_EXTRA, weather)
@@ -217,5 +227,6 @@ class MainFragment : Fragment() {
         requireActivity().bindService(intent, conn, Context.BIND_AUTO_CREATE)
 
     }
+*/
 
 }

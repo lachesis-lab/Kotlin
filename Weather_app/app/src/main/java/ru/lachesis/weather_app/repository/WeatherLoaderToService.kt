@@ -1,10 +1,12 @@
-package ru.lachesis.weather_app.model
+package ru.lachesis.weather_app.repository
 
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.google.gson.Gson
 import ru.lachesis.weather_app.BuildConfig
+import ru.lachesis.weather_app.model.Weather
+import ru.lachesis.weather_app.model.WeatherDTO
 import ru.lachesis.weather_app.viewmodel.AppState
 import java.io.BufferedReader
 import java.io.InputStreamReader

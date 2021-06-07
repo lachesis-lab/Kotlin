@@ -1,6 +1,5 @@
-package ru.lachesis.weather_app.model
+package ru.lachesis.weather_app.repository
 
-import android.app.IntentService
 import android.app.Service
 import android.content.Intent
 import android.os.Binder
@@ -9,6 +8,7 @@ import android.os.IBinder
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import ru.lachesis.weather_app.model.Weather
 import ru.lachesis.weather_app.view.WEATHER_BROADCAST_EXTRA
 import ru.lachesis.weather_app.view.WEATHER_BROADCAST_INTENT_FILTER
 import ru.lachesis.weather_app.viewmodel.AppState

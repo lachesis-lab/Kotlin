@@ -21,7 +21,7 @@
         </receiver>
 
         <service
-            android:name=".model.WeatherService"
+            android:name=".repository.WeatherService"
             android:exported="false" />
 
         <activity android:name=".view.MainActivity">

@@ -1,4 +1,7 @@
-package ru.lachesis.weather_app.model
+package ru.lachesis.weather_app.repository
+
+import ru.lachesis.weather_app.model.Weather
+import ru.lachesis.weather_app.model.WeatherDTO
 
 interface Repository {
     fun getLocalData(weather: Weather?): Weather

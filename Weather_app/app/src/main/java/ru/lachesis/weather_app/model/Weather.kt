@@ -11,13 +11,15 @@ data class Weather(
     val date: Date = Calendar.getInstance(Locale.getDefault()).time,
     var temperature: Int = 0,
     var feelsLike: Int = 0,
-    var condition: String?=""
+    var condition: String?="",
+    var icon: String?="bkn_n"
 ) : Parcelable
 {
     constructor (weatherDTO: WeatherDTO) : this() {
         this.temperature = weatherDTO.fact?.temp?:0
         this.feelsLike = weatherDTO.fact?.feels_like?:0
         this.condition = weatherDTO.fact?.condition?:""
+        this.icon = weatherDTO.fact?.icon
 
     }
     fun getDateString(): String {

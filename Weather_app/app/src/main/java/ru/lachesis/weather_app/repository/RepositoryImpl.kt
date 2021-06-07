@@ -1,7 +1,10 @@
-package ru.lachesis.weather_app.model
+package ru.lachesis.weather_app.repository
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import ru.lachesis.weather_app.model.City
+import ru.lachesis.weather_app.model.Weather
+import ru.lachesis.weather_app.model.getDefaultCity
 import java.util.*
 
 class RepositoryImpl : Repository {

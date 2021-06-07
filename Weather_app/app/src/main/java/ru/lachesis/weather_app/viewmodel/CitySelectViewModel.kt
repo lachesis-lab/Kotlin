@@ -2,8 +2,8 @@ package ru.lachesis.weather_app.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import ru.lachesis.weather_app.model.Repository
-import ru.lachesis.weather_app.model.RepositoryImpl
+import ru.lachesis.weather_app.repository.Repository
+import ru.lachesis.weather_app.repository.RepositoryImpl
 import ru.lachesis.weather_app.model.Weather
 
 class CitySelectViewModel(
