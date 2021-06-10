@@ -10,6 +10,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import ru.lachesis.weather_app.app.AppState
 import ru.lachesis.weather_app.databinding.HistoryFragmentBinding
+import ru.lachesis.weather_app.utils.showSnakeBar
 import ru.lachesis.weather_app.viewmodel.HistoryViewModel
 
 class HistoryFragment : Fragment() {
@@ -49,7 +50,20 @@ class HistoryFragment : Fragment() {
                 binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
                 adapter.setHistoryData(appState.weather)
             }
-
+            is AppState.Loading ->{
+                binding.historyRecyclerView.visibility = View.GONE
+                binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
+            }
+            is AppState.Error ->{
+                binding.historyRecyclerView.visibility = View.VISIBLE
+                binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
+                binding.historyRecyclerView.showSnakeBar(
+                    "Ошибка",
+                    "Перегрузить",
+                    {
+                        viewModel.getAllHistory()
+                    })
+            }
         }
     }
 

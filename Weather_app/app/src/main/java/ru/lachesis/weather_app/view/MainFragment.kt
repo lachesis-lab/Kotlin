@@ -19,6 +19,7 @@ import ru.lachesis.weather_app.app.AppState
 import ru.lachesis.weather_app.databinding.MainFragmentBinding
 import ru.lachesis.weather_app.model.Weather
 import ru.lachesis.weather_app.repository.WeatherService
+import ru.lachesis.weather_app.utils.showSnakeBar
 import ru.lachesis.weather_app.viewmodel.MainViewModel
 import java.util.*
 
@@ -152,6 +153,7 @@ class MainFragment : Fragment() {
         return true
     }
 
+/*
     private fun View.showSnakeBar(
         text: String,
         actionText: String,
@@ -160,6 +162,7 @@ class MainFragment : Fragment() {
     ) {
         Snackbar.make(this, text, length).setAction(actionText, action).show()
     }
+*/
 
     private fun renderData(appState: AppState?) {
 
