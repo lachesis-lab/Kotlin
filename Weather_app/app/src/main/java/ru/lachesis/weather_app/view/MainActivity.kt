@@ -29,7 +29,7 @@ class MainActivity :  AppCompatActivity()  {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if(item.itemId == R.id.history_menu_item){
             supportFragmentManager.beginTransaction()
-                .replace(R.id.main_container,HistoryFragment.newInstance(),null)
+                .add(R.id.main_container,HistoryFragment.newInstance(),null)
                 .addToBackStack("")
                 .commitAllowingStateLoss()
         }

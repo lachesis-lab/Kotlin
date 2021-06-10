@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.lachesis.weather_app.R
 import ru.lachesis.weather_app.model.Weather
 
-class HistoryAdapter(): RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
+class HistoryAdapter: RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>() {
 
     private var historyData: List<Weather> = listOf()
 
@@ -22,7 +22,7 @@ class HistoryAdapter(): RecyclerView.Adapter<HistoryAdapter.HistoryViewHolder>()
         fun bind(data: Weather) {
             if (layoutPosition != RecyclerView.NO_POSITION) {
                 itemView.findViewById<TextView>(R.id.history_item_textview) .text =
-                    String.format("%s %d %s", data.city.city, data.temperature, data.condition)
+                    String.format("%s %s %d %s", data.date, data.city.city, data.temperature, data.condition)
                 itemView.setOnClickListener {
                     Toast.makeText(
                         itemView.context,

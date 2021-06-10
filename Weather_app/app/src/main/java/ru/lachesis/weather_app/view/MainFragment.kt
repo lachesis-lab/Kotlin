@@ -1,24 +1,19 @@
 package ru.lachesis.weather_app.view
 
-import android.content.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
 import android.view.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
-import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import ru.lachesis.weather_app.R
 import ru.lachesis.weather_app.app.AppState
 import ru.lachesis.weather_app.databinding.MainFragmentBinding
 import ru.lachesis.weather_app.model.Weather
-import ru.lachesis.weather_app.repository.WeatherService
 import ru.lachesis.weather_app.utils.showSnakeBar
 import ru.lachesis.weather_app.viewmodel.MainViewModel
 import java.util.*
@@ -28,8 +23,10 @@ public const val WEATHER_BROADCAST_EXTRA = "ru.lachesis.weather_app.weather_broa
 
 class MainFragment : Fragment() {
 
+    private lateinit var liveData: MutableLiveData<AppState>
+
+/*
     private lateinit var weatherService: WeatherService
-    lateinit var liveData: MutableLiveData<AppState>
 
     private val conn: ServiceConnection = object : ServiceConnection {
         @RequiresApi(Build.VERSION_CODES.N)
@@ -45,7 +42,8 @@ class MainFragment : Fragment() {
             isBound = false
         }
     }
-    var isBound: Boolean = false
+*/
+//    var isBound: Boolean = false
     private lateinit var viewModel: MainViewModel
 
     private lateinit var weatherBundle: Weather
@@ -55,6 +53,7 @@ class MainFragment : Fragment() {
         get() = _binding!!
 
 
+/*
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
 
@@ -67,6 +66,7 @@ class MainFragment : Fragment() {
             }
         }
     }
+*/
 
     companion object {
         const val BUNDLE_EXTRA = "weather"
@@ -78,6 +78,7 @@ class MainFragment : Fragment() {
     }
 
 
+/*
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         context?.let {
@@ -85,13 +86,16 @@ class MainFragment : Fragment() {
                 .registerReceiver(receiver, IntentFilter(WEATHER_BROADCAST_INTENT_FILTER))
         }
     }
+*/
 
+/*
     override fun onDestroy() {
         context?.let {
             LocalBroadcastManager.getInstance(it).unregisterReceiver(receiver)
         }
         super.onDestroy()
     }
+*/
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -112,7 +116,7 @@ class MainFragment : Fragment() {
 
         liveData = viewModel.getLiveData()
         liveData.observe(viewLifecycleOwner, { renderData(it) })//Observer { renderData(it) })
-//        if (weather==null)
+
         viewModel.getWeatherRemote(weatherBundle)
 
         requireActivity().supportFragmentManager.beginTransaction()
@@ -171,17 +175,13 @@ class MainFragment : Fragment() {
                 val weather = appState.weather[0]
                 binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
                 setData(weather)
-                saveWeather(weather)
             }
             is AppState.Error -> {
                 binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
                 binding.mainViewContainer.showSnakeBar(
                     "Ошибка",
                     "Перегрузить",
-                    { viewModel.getWeatherLocal(null) })
-//                Snackbar.make(binding.mainViewContainer, "Ошибка", Snackbar.LENGTH_INDEFINITE)
-//                    .setAction("Перегрузить", { viewModel.getWeatherLocal(null) })
-//                    .show()
+                    { viewModel.getWeatherLocal(weatherBundle) })
             }
             is AppState.Loading -> {
                 binding.includedLoadingLayout.loadingLayout.visibility = View.VISIBLE
@@ -191,6 +191,8 @@ class MainFragment : Fragment() {
     }
 
     private fun setData(weather: Weather) {
+        saveWeather(weather)
+
         binding.date.text = weather.getDateString()
         binding.tempLabel.text = resources.getString(R.string.temp_label)
         binding.tempFeelLabel.text = resources.getString(R.string.feeled_label)
@@ -200,6 +202,8 @@ class MainFragment : Fragment() {
                 Locale.getDefault(),
                 "${resources.getString(R.string.coordinates_label)}: ${weatherBundle.city.lat},${weatherBundle.city.lon}"
             )
+
+/*
         weather.icon?.let {
             GlideToVectorYou.justLoadImage(
                 activity,
@@ -207,14 +211,15 @@ class MainFragment : Fragment() {
                 binding.weatherIcon
             )
         }
-        binding.temperature.text = weather.temperature.toString()
-        binding.tempFeel.text = weather.feelsLike.toString()
-        binding.condition.text = weather.condition
 
         Picasso.get()
             .load("https://freepngimg.com/thumb/city/36275-3-city-hd.png")
             .into(binding.headerIcon)
+*/
 
+        binding.temperature.text = weather.temperature.toString()
+        binding.tempFeel.text = weather.feelsLike.toString()
+        binding.condition.text = weather.condition
 
     }
 

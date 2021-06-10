@@ -54,7 +54,7 @@ class MainViewModel(
             override fun onResponse(call: Call<WeatherDTO>, response: Response<WeatherDTO>) {
                 val responseWeather: WeatherDTO? = response.body()
                 if (response.isSuccessful && responseWeather!=null)
-                    liveDataToObserve.value = AppState.Success(listOf(Weather(responseWeather)))
+                    liveDataToObserve.value = AppState.Success(listOf(Weather(responseWeather).also {it.city=weather.city }))
                 else
                     liveDataToObserve.value = AppState.Error(Exception(SERVER_ERROR))
             }

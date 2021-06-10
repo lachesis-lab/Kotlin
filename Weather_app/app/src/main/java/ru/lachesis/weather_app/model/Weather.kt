@@ -7,7 +7,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Weather(
-    val city: City = getDefaultCity(),
+    var city: City = getDefaultCity(),
     val date: Date = Calendar.getInstance(Locale.getDefault()).time,
     var temperature: Int = 0,
     var feelsLike: Int = 0,
