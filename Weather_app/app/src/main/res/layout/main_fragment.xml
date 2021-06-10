@@ -25,15 +25,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.65" />
+            app:layout_constraintGuide_percent="0.85" />
 
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:background="@color/white"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:background="@color/white"
             app:layout_constraintBottom_toBottomOf="@id/gline2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -43,8 +43,8 @@
                 android:id="@+id/headerIcon"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/town_header_height"
-                android:scaleType="fitXY"
-                />
+                android:scaleType="fitXY" />
+
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/date"
                 android:layout_width="wrap_content"
@@ -86,8 +86,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="5dp"
                 android:gravity="center"
-                tools:text="@string/temp_label"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                tools:text="@string/temp_label" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/temperature"
@@ -103,8 +103,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="5dp"
                 android:gravity="center"
-                tools:text="@string/feeled_label"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                tools:text="@string/feeled_label" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/temp_feel"
@@ -133,22 +133,12 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/gline2"/>
+            app:layout_constraintTop_toBottomOf="@id/gline2" />
 
-        <FrameLayout
-            android:id="@+id/loadingLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/loadingBackground"
-            android:visibility="gone"
-            tools:visibility="visible">
+        <include
+            android:id="@+id/included_loading_layout"
+            layout="@layout/loading_layout" />
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center" />
-        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

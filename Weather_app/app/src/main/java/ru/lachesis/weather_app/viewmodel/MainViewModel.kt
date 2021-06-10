@@ -1,12 +1,14 @@
 package ru.lachesis.weather_app.viewmodel
 
-import android.media.MediaRouter
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import kotlinx.android.synthetic.main.main_fragment.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import ru.lachesis.weather_app.app.App
+import ru.lachesis.weather_app.app.AppState
 import ru.lachesis.weather_app.model.Weather
 import ru.lachesis.weather_app.model.WeatherDTO
 import ru.lachesis.weather_app.repository.*
@@ -17,7 +19,8 @@ private const val REQUEST_ERROR = "Ошибка запроса на сервер
 class MainViewModel(
     private val liveDataToObserve: MutableLiveData<AppState> = MutableLiveData(),
     private val localRepository : Repository = RepositoryImpl(),
-    private val remoteRepository: MainRepository = MainRepositoryImpl(RemoteDataSource())
+    private val remoteRepository: MainRepository = MainRepositoryImpl(RemoteDataSource()) ,
+    private val historyRepositoryImpl: HistoryRepository = HistoryRepositoryImpl(App.historyDao)
 ) : ViewModel() {
 
     private val listener: Repository.WeatherLoadListener = object: Repository.WeatherLoadListener {
@@ -26,8 +29,8 @@ class MainViewModel(
         }
 
         override fun onLoaded(weatherDTO: WeatherDTO) {
-            liveDataToObserve.value=AppState.Loading
-            liveDataToObserve.postValue(AppState.Success(Weather(weatherDTO)))
+            liveDataToObserve.value= AppState.Loading
+            liveDataToObserve.postValue(AppState.Success(listOf(Weather(weatherDTO))))
         }
     }
     fun getLiveData() = liveDataToObserve
@@ -38,7 +41,7 @@ class MainViewModel(
         liveDataToObserve.value = AppState.Loading
         Thread {
             Thread.sleep(1000)
-            liveDataToObserve.postValue(AppState.Success(localRepository.getLocalData(weather)))
+            liveDataToObserve.postValue(AppState.Success(listOf(localRepository.getLocalData(weather))))
         }.start()
 
 
@@ -51,7 +54,7 @@ class MainViewModel(
             override fun onResponse(call: Call<WeatherDTO>, response: Response<WeatherDTO>) {
                 val responseWeather: WeatherDTO? = response.body()
                 if (response.isSuccessful && responseWeather!=null)
-                    liveDataToObserve.value = AppState.Success(Weather(responseWeather))
+                    liveDataToObserve.value = AppState.Success(listOf(Weather(responseWeather)))
                 else
                     liveDataToObserve.value = AppState.Error(Exception(SERVER_ERROR))
             }
@@ -63,6 +66,11 @@ class MainViewModel(
 //        liveDataToObserve.postValue(AppState.Success(remoteRepository.getWeatherFromAPI(weather.city.lat,weather.city.lon,callback))
 //        liveDataToObserve.postValue(AppState.Success(repository.getRemoteData(weather,listener)))
 //        liveDataToObserve.postValue((AppState.Success(bindService,))
+    }
+
+    fun addWeatherToDb(weather: Weather) {
+        historyRepositoryImpl.saveHistory(weather)
+
     }
 
 /*

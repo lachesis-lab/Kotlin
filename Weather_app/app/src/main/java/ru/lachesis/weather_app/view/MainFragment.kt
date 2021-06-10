@@ -2,7 +2,9 @@ package ru.lachesis.weather_app.view
 
 import android.content.*
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.IBinder
 import android.view.*
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
@@ -13,12 +15,11 @@ import com.github.twocoffeesoneteam.glidetovectoryou.GlideToVectorYou
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso.Picasso
 import ru.lachesis.weather_app.R
+import ru.lachesis.weather_app.app.AppState
 import ru.lachesis.weather_app.databinding.MainFragmentBinding
 import ru.lachesis.weather_app.model.Weather
 import ru.lachesis.weather_app.repository.WeatherService
-import ru.lachesis.weather_app.viewmodel.AppState
 import ru.lachesis.weather_app.viewmodel.MainViewModel
-import java.lang.Exception
 import java.util.*
 
 public const val WEATHER_BROADCAST_INTENT_FILTER = "ru.lachesis.weather_app.broadcast_intent_filter"
@@ -58,7 +59,7 @@ class MainFragment : Fragment() {
 
             val weather = intent?.getParcelableExtra<Weather>(WEATHER_BROADCAST_EXTRA)
             try {
-                liveData.value = AppState.Success(weather!!)
+                liveData.value = AppState.Success(listOf(weather!!))
             } catch (e: Exception) {
                 liveData.value = AppState.Error(e)
 
@@ -164,12 +165,13 @@ class MainFragment : Fragment() {
 
         when (appState) {
             is AppState.Success -> {
-                val weather = appState.weather
-                binding.loadingLayout.visibility = View.GONE
+                val weather = appState.weather[0]
+                binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
                 setData(weather)
+                saveWeather(weather)
             }
             is AppState.Error -> {
-                binding.loadingLayout.visibility = View.GONE
+                binding.includedLoadingLayout.loadingLayout.visibility = View.GONE
                 binding.mainViewContainer.showSnakeBar(
                     "Ошибка",
                     "Перегрузить",
@@ -179,7 +181,7 @@ class MainFragment : Fragment() {
 //                    .show()
             }
             is AppState.Loading -> {
-                binding.loadingLayout.visibility = View.VISIBLE
+                binding.includedLoadingLayout.loadingLayout.visibility = View.VISIBLE
             }
         }
 
@@ -212,6 +214,11 @@ class MainFragment : Fragment() {
 
 
     }
+
+    fun saveWeather(weather: Weather){
+        viewModel.addWeatherToDb(weather)
+    }
+
 /* from service
     override fun onStop() {
         super.onStop()

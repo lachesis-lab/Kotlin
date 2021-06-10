@@ -7,7 +7,7 @@ import com.google.gson.Gson
 import ru.lachesis.weather_app.BuildConfig
 import ru.lachesis.weather_app.model.Weather
 import ru.lachesis.weather_app.model.WeatherDTO
-import ru.lachesis.weather_app.viewmodel.AppState
+import ru.lachesis.weather_app.app.AppState
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.URL
@@ -20,7 +20,7 @@ class WeatherLoaderToService(
     private val lon: Double){
 
     @RequiresApi(Build.VERSION_CODES.N)
-    fun loadWeatherToService() : AppState{
+    fun loadWeatherToService() : AppState {
         try {
             val uri =
                 URL("https://api.weather.yandex.ru/v2/informers?lat=${lat}&lon=${lon}")
@@ -40,7 +40,7 @@ class WeatherLoaderToService(
 
                     val weatherDTO: WeatherDTO =
                         Gson().fromJson(getLines(bufferedReader), WeatherDTO::class.java)
-                    return AppState.Success(Weather(weatherDTO))
+                    return AppState.Success(listOf( Weather(weatherDTO)))
 //                    handler.post { listener.onLoaded(weatherDTO) }
                 } catch (err: Exception) {
                     Log.e("ConnectionError", err.toString())

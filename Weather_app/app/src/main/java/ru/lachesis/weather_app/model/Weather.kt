@@ -5,13 +5,13 @@ import android.os.Parcelable
 import java.util.*
 import kotlinx.android.parcel.Parcelize
 
-@kotlinx.parcelize.Parcelize
+@Parcelize
 data class Weather(
     val city: City = getDefaultCity(),
     val date: Date = Calendar.getInstance(Locale.getDefault()).time,
     var temperature: Int = 0,
     var feelsLike: Int = 0,
-    var condition: String?="",
+    var condition: String="",
     var icon: String?="bkn_n"
 ) : Parcelable
 {

@@ -11,7 +11,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ru.lachesis.weather_app.model.Weather
 import ru.lachesis.weather_app.view.WEATHER_BROADCAST_EXTRA
 import ru.lachesis.weather_app.view.WEATHER_BROADCAST_INTENT_FILTER
-import ru.lachesis.weather_app.viewmodel.AppState
+import ru.lachesis.weather_app.app.AppState
 
 
 class WeatherService : Service() {
@@ -37,7 +37,7 @@ class WeatherService : Service() {
             val state: AppState? = loader?.loadWeatherToService()
             when (state) {
                 is AppState.Success ->
-                    broadcastIntent.putExtra(WEATHER_BROADCAST_EXTRA, state.weather)
+                    broadcastIntent.putExtra(WEATHER_BROADCAST_EXTRA, state.weather[0])
 
                 is AppState.Error ->
                     broadcastIntent.putExtra(WEATHER_BROADCAST_EXTRA, weather)
