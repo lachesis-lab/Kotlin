@@ -119,8 +119,10 @@ class MainFragment : Fragment() {
 
         viewModel.getWeatherRemote(weatherBundle)
 
+/*
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(binding.dayFragmentContainer.id, DayFragment.newInstance()).commit()
+*/
 
         registerForContextMenu(binding.cityName)
     }
@@ -148,10 +150,12 @@ class MainFragment : Fragment() {
         val fManager = activity?.supportFragmentManager
         val transaction = fManager?.beginTransaction()
         transaction?.replace(binding.mainContainer.id, CitySelectFragment.newInstance())
+/*
         val fragment = fManager?.findFragmentById(R.id.day_fragment_container)
         if (fragment != null) {
             transaction?.hide(fragment)
         }
+*/
         transaction?.addToBackStack("")?.commit()
 
         return true
@@ -203,7 +207,6 @@ class MainFragment : Fragment() {
                 "${resources.getString(R.string.coordinates_label)}: ${weatherBundle.city.lat},${weatherBundle.city.lon}"
             )
 
-/*
         weather.icon?.let {
             GlideToVectorYou.justLoadImage(
                 activity,
@@ -215,7 +218,6 @@ class MainFragment : Fragment() {
         Picasso.get()
             .load("https://freepngimg.com/thumb/city/36275-3-city-hd.png")
             .into(binding.headerIcon)
-*/
 
         binding.temperature.text = weather.temperature.toString()
         binding.tempFeel.text = weather.feelsLike.toString()

@@ -16,7 +16,9 @@ class MainActivity :  AppCompatActivity()  {
         if (savedInstanceState == null) {
             val transaction = supportFragmentManager.beginTransaction()
             transaction.replace(R.id.main_container, MainFragment.newInstance(null))
+/*
             transaction.replace(R.id.day_fragment_container,DayFragment.newInstance())
+*/
             transaction.commit()
         }
     }

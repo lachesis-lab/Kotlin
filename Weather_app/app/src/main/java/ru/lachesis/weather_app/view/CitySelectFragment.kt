@@ -24,7 +24,9 @@ class CitySelectFragment : Fragment() {
             val fManager = activity?.supportFragmentManager
             val transaction = fManager?.beginTransaction()
             transaction?.replace(R.id.main_container,MainFragment.newInstance(bundle))
+/*
             transaction?.replace(R.id.day_fragment_container,DayFragment.newInstance())
+*/
 //            transaction?.addToBackStack("")
             transaction?.commit()
         }
