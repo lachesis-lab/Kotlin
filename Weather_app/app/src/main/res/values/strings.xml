@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">weather_app</string>
+    <string name="temp_label">Температура</string>
+    <string name="feeled_label">Ощущается как</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="city_change_text">Выбрать город</string>
+    <string name="coordinates_label">lt/ln:</string>
+    <string name="menu_title_history">History</string>
+    <string name="content_provider">Content provider</string>
+    <string name="authorities">ru.lachesis.provider</string>
+</resources>
