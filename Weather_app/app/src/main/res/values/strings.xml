@@ -7,4 +7,6 @@
     <string name="city_change_text">Выбрать город</string>
     <string name="coordinates_label">lt/ln:</string>
     <string name="menu_title_history">History</string>
+    <string name="content_provider">Content provider</string>
+    <string name="authorities">ru.lachesis.provider</string>
 </resources>

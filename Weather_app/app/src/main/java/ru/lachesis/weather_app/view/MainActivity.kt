@@ -29,13 +29,32 @@ class MainActivity :  AppCompatActivity()  {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == R.id.history_menu_item){
+
+        when (item.itemId) {
+            R.id.menu_content_provider -> {
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.main_container,ContactsFragment.newInstance(),null)
+                    .addToBackStack("")
+                    .commitAllowingStateLoss()
+
+            }
+            R.id.history_menu_item -> {
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.main_container,HistoryFragment.newInstance(),null)
+                    .addToBackStack("")
+                    .commitAllowingStateLoss()
+
+            }
+
+        }
+
+ /*       if(item.itemId == R.id.history_menu_item){
             supportFragmentManager.beginTransaction()
                 .add(R.id.main_container,HistoryFragment.newInstance(),null)
                 .addToBackStack("")
                 .commitAllowingStateLoss()
         }
-        return true
+ */       return true
     }
     override fun onBackPressed() {
         val fManager = supportFragmentManager
