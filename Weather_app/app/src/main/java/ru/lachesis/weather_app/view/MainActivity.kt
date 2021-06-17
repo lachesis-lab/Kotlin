@@ -45,16 +45,19 @@ class MainActivity :  AppCompatActivity()  {
                     .commitAllowingStateLoss()
 
             }
+            R.id.menu_google_maps -> {
+                supportFragmentManager.apply {
+                    beginTransaction()
+                        .add(R.id.main_container, GoogleMapsFragment.newInstance())
+                        .addToBackStack("")
+                        .commitAllowingStateLoss()
+                }
+
+            }
+
 
         }
-
- /*       if(item.itemId == R.id.history_menu_item){
-            supportFragmentManager.beginTransaction()
-                .add(R.id.main_container,HistoryFragment.newInstance(),null)
-                .addToBackStack("")
-                .commitAllowingStateLoss()
-        }
- */       return true
+        return true
     }
     override fun onBackPressed() {
         val fManager = supportFragmentManager

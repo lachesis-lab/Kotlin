@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment
 import ru.lachesis.weather_app.R
 import ru.lachesis.weather_app.databinding.ContactsFragmentBinding
 
-const val REQUEST_CODE = 442
+private const val REQUEST_CODE = 442
 
 class ContactsFragment : Fragment() {
 
