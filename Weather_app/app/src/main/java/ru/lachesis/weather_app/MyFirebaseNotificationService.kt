@@ -15,10 +15,10 @@ import com.google.firebase.messaging.RemoteMessage
 class MyFirebaseNotificationService : FirebaseMessagingService() {
 
     companion object {
-        private const val PUSH_KEY_TITLE = "title"
-        private const val PUSH_KEY_MESSAGE = "message"
+//        private const val PUSH_KEY_TITLE = "title"
+//        private const val PUSH_KEY_MESSAGE = "message"
         private const val CHANNEL_ID = "channel_id"
-        private const val NOTIFICATION_ID = 37
+        private var notification_id = 0
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
@@ -26,14 +26,18 @@ class MyFirebaseNotificationService : FirebaseMessagingService() {
         val messageData = message.data
         if (messageData.isNotEmpty())
             handleDataMessage(messageData.toMap())
+        else showNotification(message.notification!!.title!!,message.notification!!.body!!)
     }
 
     private fun handleDataMessage(data: Map<String, String>) {
-        val title = data[PUSH_KEY_TITLE]
-        val message = data[PUSH_KEY_MESSAGE]
-        if (!title.isNullOrBlank() && !message.isNullOrBlank()) {
-            showNotification(title, message)
+        val str: StringBuilder
+        data.forEach { entry: Map.Entry<String, String> ->
+            val k = entry.key
+            val v = entry.value
+        if (k.isNotBlank() && v.isNotBlank())
+            showNotification(k, v)
         }
+
 
     }
 
@@ -52,7 +56,7 @@ class MyFirebaseNotificationService : FirebaseMessagingService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel(notificationManager)
         }
-        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+        notificationManager.notify(notification_id++, notificationBuilder.build())
 
     }
     @RequiresApi(Build.VERSION_CODES.O)
