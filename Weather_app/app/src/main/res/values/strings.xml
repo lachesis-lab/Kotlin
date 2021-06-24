@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">weather_app</string>
+    <string name="temp_label">Температура</string>
+    <string name="feeled_label">Ощущается как</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="city_change_text">Выбрать город</string>
+    <string name="coordinates_label">lt/ln:</string>
+    <string name="menu_title_history">History</string>
+    <string name="content_provider">Content provider</string>
+    <string name="authorities">ru.lachesis.provider</string>
+    <string name="dialog_button_close">Закрыть</string>
+    <string name="dialog_title_no_gps">Доступ к геолокации закрыт</string>
+    <string name="dialog_message_no_gps">Разрешите доступ к геолокации, если хотите узнать погоду текущего места</string>
+    <string name="dialog_title_gps_turned_off">GPS отключён</string>
+    <string name="dialog_message_last_location_unknown">Местонахождение неизвестно. Включите GPS, если хотите получить погоду по текущему адресу</string>
+    <string name="dialog_message_last_known_location">Показана последняя известная локация. Включите GPS, если хотите обновить местонахождение</string>
+    <string name="dialog_rationale_title">Доступ к геолокации</string>
+    <string name="dialog_rationale_message">Объяснение</string>
+    <string name="dialog_rationale_give_access">Предоставить доступ</string>
+    <string name="dialog_rationale_decline">Не надо</string>
+    <string name="dialog_address_title">Ваш адрес</string>
+    <string name="dialog_address_get_weather">Узнать погоду</string>
+    <string name="default_address">Red square, 1</string>
+    <string name="button_search_map">Найти</string>
+    <string name="google_maps">Google maps</string>
+    <string name="marker_start">Start</string>
+    <string name="about">About</string>
+</resources>
