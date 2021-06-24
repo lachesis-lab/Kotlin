@@ -21,6 +21,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+
     buildTypes.each {
         Properties properties = new Properties()
         properties.load(project.rootProject.file("apikey.properties").newDataInputStream())
@@ -31,12 +32,54 @@ android {
     buildFeatures {
         viewBinding true
     }
+    signingConfigs {
+        release {
+            storeFile file("key.jks")
+            Properties properties = new Properties()
+            properties.load(project.rootProject.file("signing.properties").newDataInputStream())
+            def _storePassword  = properties.getProperty("storePassword", "")
+            def _keyAlias  = properties.getProperty("keyAlias", "")
+            def _keyPassword  = properties.getProperty("keyPassword", "")
+            storePassword _storePassword
+            keyAlias _keyAlias
+            keyPassword _keyPassword
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "TYPE", '"RELEASE"'
+            versionNameSuffix '-release'
+            Properties properties = new Properties()
+            properties.load(project.rootProject.file("apikey.properties").newDataInputStream())
+            def googleMapKey  = properties.getProperty("google_maps_key", "")
+            it.buildConfigField "String", "google_maps_key", googleMapKey
+        }
+
+        beta {
+            initWith debug
+            versionNameSuffix "-beta"
+            buildConfigField "String", "TYPE", '"BETA"'
+        }
+
+        debug {
+            versionNameSuffix "-debug"
+            buildConfigField "String", "TYPE", '"DEBUG"'
+        }
+
+    }
+
+/*
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+*/
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

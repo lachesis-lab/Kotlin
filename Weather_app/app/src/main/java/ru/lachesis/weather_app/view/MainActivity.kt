@@ -4,8 +4,9 @@ package ru.lachesis.weather_app.view
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentManager
+import ru.lachesis.weather_app.BuildConfig
 import ru.lachesis.weather_app.R
 
 class MainActivity :  AppCompatActivity()  {
@@ -52,9 +53,10 @@ class MainActivity :  AppCompatActivity()  {
                         .addToBackStack("")
                         .commitAllowingStateLoss()
                 }
-
             }
-
+            R.id.version_menu_item -> {
+                Toast.makeText(this, BuildConfig.BUILD_TYPE, Toast.LENGTH_SHORT).show()
+            }
 
         }
         return true
